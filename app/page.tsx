@@ -7,54 +7,56 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-[#FFE4C4]">
-      {/* Navigation */}
-      <nav className="bg-[#8B4513] shadow-md">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <span className="text-3xl">⌨️</span>
-              <h1 className="text-2xl font-bold text-[#FFE4C4]">TypeCafé</h1>
-            </div>
+      {/* Floating Glassy Navigation */}
+      <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-5xl px-6">
+        <nav className="bg-[#8B4513]/80 backdrop-blur-md shadow-2xl rounded-full border border-[#A0522D]/30">
+          <div className="px-8 py-4">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <span className="text-3xl">⌨️</span>
+                <h1 className="text-2xl font-bold text-[#FFE4C4]">TypeCafé</h1>
+              </div>
 
-            <div className="flex items-center gap-4">
-              {session?.user ? (
-                <>
-                  <Link
-                    href="/dashboard"
-                    className="text-[#FFE4C4] hover:text-[#FFDAB9] transition-colors"
-                  >
-                    Dashboard
-                  </Link>
-                  <Link
-                    href="/test"
-                    className="bg-[#D2691E] text-white px-6 py-2 rounded-full hover:bg-[#CD853F] transition-colors font-semibold"
-                  >
-                    Start Test
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <Link
-                    href="/login"
-                    className="text-[#FFE4C4] hover:text-[#FFDAB9] transition-colors"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    href="/register"
-                    className="bg-[#D2691E] text-white px-6 py-2 rounded-full hover:bg-[#CD853F] transition-colors font-semibold"
-                  >
-                    Sign Up
-                  </Link>
-                </>
-              )}
+              <div className="flex items-center gap-6">
+                {session?.user ? (
+                  <>
+                    <Link
+                      href="/dashboard"
+                      className="text-[#FFE4C4] hover:text-[#FFDAB9] transition-colors font-medium"
+                    >
+                      Dashboard
+                    </Link>
+                    <Link
+                      href="/test"
+                      className="bg-[#D2691E] text-white px-6 py-2.5 rounded-full hover:bg-[#CD853F] transition-all transform hover:scale-105 font-semibold shadow-lg"
+                    >
+                      Start Test
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      className="text-[#FFE4C4] hover:text-[#FFDAB9] transition-colors font-medium"
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      href="/register"
+                      className="bg-[#D2691E] text-white px-6 py-2.5 rounded-full hover:bg-[#CD853F] transition-all transform hover:scale-105 font-semibold shadow-lg"
+                    >
+                      Sign Up
+                    </Link>
+                  </>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      </div>
 
       {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-6 py-20">
+      <section className="max-w-7xl mx-auto px-6 pt-32 pb-20">
         <div className="text-center">
           <div className="mb-6">
             <span className="text-8xl inline-block animate-bounce">☕</span>
