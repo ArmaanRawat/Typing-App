@@ -278,110 +278,125 @@ export default function TestPage() {
               <p className="text-[#A0522D]">Configure your test and start brewing!</p>
             </div>
 
-            {/* Mode Selection */}
-            <div className="bg-white/80 backdrop-blur-sm border border-[#DEB887]/30 rounded-xl p-6 shadow-md">
-              <label className="block text-sm font-semibold text-[#8B4513] mb-3">
-                Test Mode
-              </label>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setMode("time")}
-                  className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
-                    mode === "time"
-                      ? "bg-[#8B4513] text-[#FFE4C4] shadow-md"
-                      : "bg-white border border-[#DEB887] text-[#8B4513] hover:bg-[#FFE4C4]"
-                  }`}
-                >
-                  ⏱️ Time-based
-                </button>
-                <button
-                  onClick={() => setMode("chars")}
-                  className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
-                    mode === "chars"
-                      ? "bg-[#8B4513] text-[#FFE4C4] shadow-md"
-                      : "bg-white border border-[#DEB887] text-[#8B4513] hover:bg-[#FFE4C4]"
-                  }`}
-                >
-                  📝 Character-based
-                </button>
-              </div>
-            </div>
-
-            {/* Duration/Character Count */}
-            <div className="bg-white/80 backdrop-blur-sm border border-[#DEB887]/30 rounded-xl p-6 shadow-md">
-              <label className="block text-sm font-semibold text-[#8B4513] mb-3">
-                {mode === "time" ? "Duration" : "Character Count"}
-              </label>
-              <div className="flex gap-3">
-                {mode === "time"
-                  ? [15, 30, 60].map((sec) => (
-                      <button
-                        key={sec}
-                        onClick={() => setTargetValue(sec)}
-                        className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
-                          targetValue === sec
-                            ? "bg-[#D2691E] text-white shadow-md"
-                            : "bg-white border border-[#DEB887] text-[#8B4513] hover:bg-[#FFE4C4]"
-                        }`}
-                      >
-                        {sec}s
-                      </button>
-                    ))
-                  : [100, 200].map((chars) => (
-                      <button
-                        key={chars}
-                        onClick={() => setTargetValue(chars)}
-                        className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
-                          targetValue === chars
-                            ? "bg-[#D2691E] text-white shadow-md"
-                            : "bg-white border border-[#DEB887] text-[#8B4513] hover:bg-[#FFE4C4]"
-                        }`}
-                      >
-                        {chars} chars
-                      </button>
-                    ))}
-              </div>
-            </div>
-
-            {/* Text Source */}
-            <div className="bg-white/80 backdrop-blur-sm border border-[#DEB887]/30 rounded-xl p-6 shadow-md">
-              <label className="block text-sm font-semibold text-[#8B4513] mb-3">
-                Text Source
-              </label>
-              <div className="flex gap-3 mb-4">
-                <button
-                  onClick={() => setTextSource("random")}
-                  className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
-                    textSource === "random"
-                      ? "bg-[#8B4513] text-[#FFE4C4] shadow-md"
-                      : "bg-white border border-[#DEB887] text-[#8B4513] hover:bg-[#FFE4C4]"
-                  }`}
-                >
-                  🎲 Random Text
-                </button>
-                <button
-                  onClick={() => setTextSource("custom")}
-                  className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
-                    textSource === "custom"
-                      ? "bg-[#8B4513] text-[#FFE4C4] shadow-md"
-                      : "bg-white border border-[#DEB887] text-[#8B4513] hover:bg-[#FFE4C4]"
-                  }`}
-                >
-                  ✍️ Custom Text
-                </button>
+            {/* Compact Test Configuration Card */}
+            <div className="bg-white/80 backdrop-blur-sm border border-[#DEB887]/30 rounded-xl p-6 shadow-md space-y-5">
+              
+              {/* Mode Selection */}
+              <div className="flex items-center justify-between gap-4">
+                <label className="text-sm font-semibold text-[#8B4513] min-w-[100px]">
+                  Test Mode
+                </label>
+                <div className="flex gap-2 flex-1">
+                  <button
+                    onClick={() => setMode("time")}
+                    className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all text-sm ${
+                      mode === "time"
+                        ? "bg-[#8B4513] text-[#FFE4C4] shadow-md"
+                        : "bg-white border border-[#DEB887] text-[#8B4513] hover:bg-[#FFE4C4]"
+                    }`}
+                  >
+                    ⏱️ Time
+                  </button>
+                  <button
+                    onClick={() => setMode("chars")}
+                    className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all text-sm ${
+                      mode === "chars"
+                        ? "bg-[#8B4513] text-[#FFE4C4] shadow-md"
+                        : "bg-white border border-[#DEB887] text-[#8B4513] hover:bg-[#FFE4C4]"
+                    }`}
+                  >
+                    📝 Characters
+                  </button>
+                </div>
               </div>
 
+              {/* Divider */}
+              <div className="border-t border-[#DEB887]/20"></div>
+
+              {/* Duration/Character Count */}
+              <div className="flex items-center justify-between gap-4">
+                <label className="text-sm font-semibold text-[#8B4513] min-w-[100px]">
+                  {mode === "time" ? "Duration" : "Char Count"}
+                </label>
+                <div className="flex gap-2 flex-1">
+                  {mode === "time"
+                    ? [15, 30, 60].map((sec) => (
+                        <button
+                          key={sec}
+                          onClick={() => setTargetValue(sec)}
+                          className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all text-sm ${
+                            targetValue === sec
+                              ? "bg-[#D2691E] text-white shadow-md"
+                              : "bg-white border border-[#DEB887] text-[#8B4513] hover:bg-[#FFE4C4]"
+                          }`}
+                        >
+                          {sec}s
+                        </button>
+                      ))
+                    : [100, 200].map((chars) => (
+                        <button
+                          key={chars}
+                          onClick={() => setTargetValue(chars)}
+                          className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all text-sm ${
+                            targetValue === chars
+                              ? "bg-[#D2691E] text-white shadow-md"
+                              : "bg-white border border-[#DEB887] text-[#8B4513] hover:bg-[#FFE4C4]"
+                          }`}
+                        >
+                          {chars}
+                        </button>
+                      ))}
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div className="border-t border-[#DEB887]/20"></div>
+
+              {/* Text Source */}
+              <div className="flex items-center justify-between gap-4">
+                <label className="text-sm font-semibold text-[#8B4513] min-w-[100px]">
+                  Text Source
+                </label>
+                <div className="flex gap-2 flex-1">
+                  <button
+                    onClick={() => setTextSource("random")}
+                    className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all text-sm ${
+                      textSource === "random"
+                        ? "bg-[#8B4513] text-[#FFE4C4] shadow-md"
+                        : "bg-white border border-[#DEB887] text-[#8B4513] hover:bg-[#FFE4C4]"
+                    }`}
+                  >
+                    🎲 Random
+                  </button>
+                  <button
+                    onClick={() => setTextSource("custom")}
+                    className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all text-sm ${
+                      textSource === "custom"
+                        ? "bg-[#8B4513] text-[#FFE4C4] shadow-md"
+                        : "bg-white border border-[#DEB887] text-[#8B4513] hover:bg-[#FFE4C4]"
+                    }`}
+                  >
+                    ✍️ Custom
+                  </button>
+                </div>
+              </div>
+
+              {/* Custom Text Area */}
               {textSource === "custom" && (
-                <textarea
-                  value={customText}
-                  onChange={(e) => setCustomText(e.target.value)}
-                  placeholder="Paste or type your custom text here..."
-                  className="w-full px-4 py-3 bg-white border border-[#DEB887] rounded-lg focus:ring-2 focus:ring-[#8B4513] focus:border-transparent text-[#8B4513] placeholder-[#A0522D]/50"
-                  rows={4}
-                />
+                <>
+                  <div className="border-t border-[#DEB887]/20"></div>
+                  <textarea
+                    value={customText}
+                    onChange={(e) => setCustomText(e.target.value)}
+                    placeholder="Paste or type your custom text here..."
+                    className="w-full px-4 py-3 bg-white border border-[#DEB887] rounded-lg focus:ring-2 focus:ring-[#8B4513] focus:border-transparent text-[#8B4513] placeholder-[#A0522D]/50 text-sm"
+                    rows={3}
+                  />
+                </>
               )}
             </div>
 
+            {/* Start Button */}
             <button
               onClick={startTest}
               className="w-full bg-gradient-to-r from-[#8B4513] to-[#A0522D] text-[#FFE4C4] py-4 rounded-xl text-lg font-bold hover:from-[#A0522D] hover:to-[#8B4513] transition-all transform hover:scale-[1.02] shadow-lg"
