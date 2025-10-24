@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const parsed = schema.parse(body);
 
-    const userId = (session.user as any).id as string;
+    const userId = (session.user as { id: string }).id as string;
 
     await prisma.testResult.create({
       data: {

@@ -33,7 +33,19 @@ export default function TestPage() {
   const [backspaces, setBackspaces] = useState(0);
   const [currentWpm, setCurrentWpm] = useState(0);
   const [currentRawWpm, setCurrentRawWpm] = useState(0);
-  const [finalMetrics, setFinalMetrics] = useState<any>(null);
+  const [finalMetrics, setFinalMetrics] = useState<{
+    durationSec: number;
+    mode: Mode;
+    targetValue: number;
+    wpm: number;
+    rawWpm: number;
+    accuracy: number;
+    backspaces: number;
+    errors: number;
+    charsTyped: number;
+    wordsTyped: number;
+    source: string;
+  } | null>(null);
   
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const finishingRef = useRef(false);

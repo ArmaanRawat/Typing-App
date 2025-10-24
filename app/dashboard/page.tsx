@@ -14,7 +14,7 @@ export default async function DashboardPage({
     redirect("/login?callbackUrl=/dashboard");
   }
 
-  const userId = (session.user as any).id as string;
+  const userId = (session.user as { id: string }).id as string;
   const params = await searchParams;
   const page = parseInt(params.page || "1");
   const pageSize = 10;
@@ -96,7 +96,7 @@ export default async function DashboardPage({
             Welcome back, {session.user.name || "Typist"}! ☕
           </h1>
           <p className="text-[#A0522D]">
-            Here's your typing journey overview
+            Here&apos;s your typing journey overview
           </p>
         </div>
 
