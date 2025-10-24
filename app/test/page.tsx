@@ -282,14 +282,14 @@ export default function TestPage() {
             <div className="bg-white/80 backdrop-blur-sm border border-[#DEB887]/30 rounded-xl p-6 shadow-md space-y-5">
               
               {/* Mode Selection */}
-              <div className="flex items-center justify-between gap-4">
-                <label className="text-sm font-semibold text-[#8B4513] min-w-[100px]">
+              <div className="flex items-center gap-4">
+                <label className="text-sm font-semibold text-[#8B4513] w-24">
                   Test Mode
                 </label>
-                <div className="flex gap-2 flex-1">
+                <div className="flex gap-2">
                   <button
                     onClick={() => setMode("time")}
-                    className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all text-sm ${
+                    className={`px-6 py-2 rounded-lg font-medium transition-all text-sm ${
                       mode === "time"
                         ? "bg-[#8B4513] text-[#FFE4C4] shadow-md"
                         : "bg-white border border-[#DEB887] text-[#8B4513] hover:bg-[#FFE4C4]"
@@ -299,7 +299,7 @@ export default function TestPage() {
                   </button>
                   <button
                     onClick={() => setMode("chars")}
-                    className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all text-sm ${
+                    className={`px-6 py-2 rounded-lg font-medium transition-all text-sm ${
                       mode === "chars"
                         ? "bg-[#8B4513] text-[#FFE4C4] shadow-md"
                         : "bg-white border border-[#DEB887] text-[#8B4513] hover:bg-[#FFE4C4]"
@@ -314,17 +314,17 @@ export default function TestPage() {
               <div className="border-t border-[#DEB887]/20"></div>
 
               {/* Duration/Character Count */}
-              <div className="flex items-center justify-between gap-4">
-                <label className="text-sm font-semibold text-[#8B4513] min-w-[100px]">
+              <div className="flex items-center gap-4">
+                <label className="text-sm font-semibold text-[#8B4513] w-24">
                   {mode === "time" ? "Duration" : "Char Count"}
                 </label>
-                <div className="flex gap-2 flex-1">
+                <div className="flex gap-2">
                   {mode === "time"
                     ? [15, 30, 60].map((sec) => (
                         <button
                           key={sec}
                           onClick={() => setTargetValue(sec)}
-                          className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all text-sm ${
+                          className={`px-5 py-2 rounded-lg font-medium transition-all text-sm ${
                             targetValue === sec
                               ? "bg-[#D2691E] text-white shadow-md"
                               : "bg-white border border-[#DEB887] text-[#8B4513] hover:bg-[#FFE4C4]"
@@ -337,7 +337,7 @@ export default function TestPage() {
                         <button
                           key={chars}
                           onClick={() => setTargetValue(chars)}
-                          className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all text-sm ${
+                          className={`px-5 py-2 rounded-lg font-medium transition-all text-sm ${
                             targetValue === chars
                               ? "bg-[#D2691E] text-white shadow-md"
                               : "bg-white border border-[#DEB887] text-[#8B4513] hover:bg-[#FFE4C4]"
@@ -353,14 +353,14 @@ export default function TestPage() {
               <div className="border-t border-[#DEB887]/20"></div>
 
               {/* Text Source */}
-              <div className="flex items-center justify-between gap-4">
-                <label className="text-sm font-semibold text-[#8B4513] min-w-[100px]">
+              <div className="flex items-center gap-4">
+                <label className="text-sm font-semibold text-[#8B4513] w-24">
                   Text Source
                 </label>
-                <div className="flex gap-2 flex-1">
+                <div className="flex gap-2">
                   <button
                     onClick={() => setTextSource("random")}
-                    className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all text-sm ${
+                    className={`px-6 py-2 rounded-lg font-medium transition-all text-sm ${
                       textSource === "random"
                         ? "bg-[#8B4513] text-[#FFE4C4] shadow-md"
                         : "bg-white border border-[#DEB887] text-[#8B4513] hover:bg-[#FFE4C4]"
@@ -370,7 +370,7 @@ export default function TestPage() {
                   </button>
                   <button
                     onClick={() => setTextSource("custom")}
-                    className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all text-sm ${
+                    className={`px-6 py-2 rounded-lg font-medium transition-all text-sm ${
                       textSource === "custom"
                         ? "bg-[#8B4513] text-[#FFE4C4] shadow-md"
                         : "bg-white border border-[#DEB887] text-[#8B4513] hover:bg-[#FFE4C4]"
