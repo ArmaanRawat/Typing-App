@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 
 type Mode = "time" | "chars";
 type TestStatus = "idle" | "running" | "finished";
@@ -48,37 +49,14 @@ export default function TestPage() {
   const startTimeRef = useRef<number | null>(null);
 
   // Update refs whenever state changes
-  useEffect(() => {
-    userInputRef.current = userInput;
-  }, [userInput]);
-
-  useEffect(() => {
-    testTextRef.current = testText;
-  }, [testText]);
-
-  useEffect(() => {
-    errorsRef.current = errors;
-  }, [errors]);
-
-  useEffect(() => {
-    backspacesRef.current = backspaces;
-  }, [backspaces]);
-
-  useEffect(() => {
-    modeRef.current = mode;
-  }, [mode]);
-
-  useEffect(() => {
-    targetValueRef.current = targetValue;
-  }, [targetValue]);
-
-  useEffect(() => {
-    textSourceRef.current = textSource;
-  }, [textSource]);
-
-  useEffect(() => {
-    startTimeRef.current = startTime;
-  }, [startTime]);
+  useEffect(() => { userInputRef.current = userInput; }, [userInput]);
+  useEffect(() => { testTextRef.current = testText; }, [testText]);
+  useEffect(() => { errorsRef.current = errors; }, [errors]);
+  useEffect(() => { backspacesRef.current = backspaces; }, [backspaces]);
+  useEffect(() => { modeRef.current = mode; }, [mode]);
+  useEffect(() => { targetValueRef.current = targetValue; }, [targetValue]);
+  useEffect(() => { textSourceRef.current = textSource; }, [textSource]);
+  useEffect(() => { startTimeRef.current = startTime; }, [startTime]);
 
   const generateRandomText = () => {
     const randomIndex = Math.floor(Math.random() * SAMPLE_TEXTS.length);
@@ -86,29 +64,13 @@ export default function TestPage() {
   };
 
   const finishTest = useCallback(async () => {
-    console.log("finishTest called", { 
-      finishingRef: finishingRef.current, 
-      startTime: startTimeRef.current, 
-      testStatus,
-      inputLength: userInputRef.current.length 
-    });
-    
-    if (finishingRef.current || !startTimeRef.current || testStatus !== "running") {
-      console.log("finishTest early return");
-      return;
-    }
+    if (finishingRef.current || !startTimeRef.current || testStatus !== "running") return;
     
     finishingRef.current = true;
 
     const elapsed = (Date.now() - startTimeRef.current) / 1000;
     const elapsedMinutes = elapsed / 60;
 
-    console.log("Calculating metrics", { 
-      userInputLength: userInputRef.current.length, 
-      elapsed 
-    });
-
-    // If no input, set metrics with 0s
     if (userInputRef.current.length === 0) {
       const metrics = {
         durationSec: Math.round(elapsed),
@@ -123,7 +85,6 @@ export default function TestPage() {
         wordsTyped: 0,
         source: textSourceRef.current,
       };
-      console.log("No input metrics", metrics);
       setFinalMetrics(metrics);
       setTestStatus("finished");
       return;
@@ -136,10 +97,8 @@ export default function TestPage() {
 
     const totalChars = userInputRef.current.length;
     const accuracy = correctChars / totalChars;
-
     const wpm = (correctChars / 5) / elapsedMinutes;
     const rawWpm = (totalChars / 5) / elapsedMinutes;
-
     const wordsTyped = userInputRef.current.trim().split(/\s+/).filter(w => w.length > 0).length;
 
     const metrics = {
@@ -156,29 +115,16 @@ export default function TestPage() {
       source: textSourceRef.current,
     };
 
-    console.log("Final metrics calculated", metrics);
-
     setFinalMetrics(metrics);
     setTestStatus("finished");
 
-    // Save to database if logged in
     if (session?.user) {
-      console.log("Saving to database...");
       try {
-        const response = await fetch("/api/tests", {
+        await fetch("/api/tests", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(metrics),
         });
-        
-        const data = await response.json();
-        console.log("API response", { ok: response.ok, data });
-        
-        if (!response.ok) {
-          console.error("Failed to save test result", data);
-        } else {
-          console.log("Test saved successfully");
-        }
       } catch (error) {
         console.error("Failed to save test result:", error);
       }
@@ -290,244 +236,312 @@ export default function TestPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-12">
-      {testStatus === "idle" && (
-        <>
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Typing Test</h1>
+    <div className="min-h-screen bg-gradient-to-br from-[#FFE4C4] via-[#FFDAB9] to-[#FFE4C4]">
+      {/* Floating Navigation */}
+      <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-4xl px-4">
+        <nav className="bg-[#8B4513]/70 backdrop-blur-lg shadow-xl rounded-full border border-[#A0522D]/20">
+          <div className="px-6 py-3">
+            <div className="flex justify-between items-center">
+              <Link href="/" className="flex items-center gap-2">
+                <span className="text-2xl">⌨️</span>
+                <h1 className="text-xl font-bold text-[#FFE4C4]">TypeCafé</h1>
+              </Link>
 
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Test Mode
-            </label>
-            <div className="flex gap-4">
-              <button
-                onClick={() => setMode("time")}
-                className={`px-4 py-2 rounded-lg border ${
-                  mode === "time"
-                    ? "bg-black text-white border-black"
-                    : "bg-white text-gray-700 border-gray-300"
-                }`}
-              >
-                Time-based
-              </button>
-              <button
-                onClick={() => setMode("chars")}
-                className={`px-4 py-2 rounded-lg border ${
-                  mode === "chars"
-                    ? "bg-black text-white border-black"
-                    : "bg-white text-gray-700 border-gray-300"
-                }`}
-              >
-                Character-based
-              </button>
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {mode === "time" ? "Duration" : "Character Count"}
-            </label>
-            <div className="flex gap-3">
-              {mode === "time"
-                ? [15, 30, 60].map((sec) => (
-                    <button
-                      key={sec}
-                      onClick={() => setTargetValue(sec)}
-                      className={`px-4 py-2 rounded-lg border ${
-                        targetValue === sec
-                          ? "bg-black text-white border-black"
-                          : "bg-white text-gray-700 border-gray-300"
-                      }`}
-                    >
-                      {sec}s
-                    </button>
-                  ))
-                : [100, 200].map((chars) => (
-                    <button
-                      key={chars}
-                      onClick={() => setTargetValue(chars)}
-                      className={`px-4 py-2 rounded-lg border ${
-                        targetValue === chars
-                          ? "bg-black text-white border-black"
-                          : "bg-white text-gray-700 border-gray-300"
-                      }`}
-                    >
-                      {chars} chars
-                    </button>
-                  ))}
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Text Source
-            </label>
-            <div className="flex gap-4 mb-3">
-              <button
-                onClick={() => setTextSource("random")}
-                className={`px-4 py-2 rounded-lg border ${
-                  textSource === "random"
-                    ? "bg-black text-white border-black"
-                    : "bg-white text-gray-700 border-gray-300"
-                }`}
-              >
-                Random Text
-              </button>
-              <button
-                onClick={() => setTextSource("custom")}
-                className={`px-4 py-2 rounded-lg border ${
-                  textSource === "custom"
-                    ? "bg-black text-white border-black"
-                    : "bg-white text-gray-700 border-gray-300"
-                }`}
-              >
-                Custom Text
-              </button>
-            </div>
-
-            {textSource === "custom" && (
-              <textarea
-                value={customText}
-                onChange={(e) => setCustomText(e.target.value)}
-                placeholder="Paste or type your custom text here..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-                rows={4}
-              />
-            )}
-          </div>
-
-          <button
-            onClick={startTest}
-            className="bg-black text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-800"
-          >
-            Start Test
-          </button>
-        </>
-      )}
-
-      {testStatus === "running" && (
-        <>
-          <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6 grid grid-cols-2 md:grid-cols-4 gap-6">
-            {mode === "time" ? (
-              <div>
-                <div className="text-sm text-gray-600">Time Left</div>
-                <div className="text-3xl font-bold text-gray-900">{timeLeft}s</div>
+              <div className="flex items-center gap-4">
+                {session?.user && (
+                  <Link
+                    href="/dashboard"
+                    className="text-[#FFE4C4] hover:text-[#FFDAB9] transition-colors font-medium text-sm"
+                  >
+                    Dashboard
+                  </Link>
+                )}
+                <Link
+                  href="/"
+                  className="text-[#FFE4C4] hover:text-[#FFDAB9] transition-colors font-medium text-sm"
+                >
+                  Home
+                </Link>
               </div>
-            ) : (
-              <div>
-                <div className="text-sm text-gray-600">Characters Left</div>
-                <div className="text-3xl font-bold text-gray-900">
-                  {Math.max(0, targetValue - userInput.length)}
+            </div>
+          </div>
+        </nav>
+      </div>
+
+      <div className="max-w-5xl mx-auto px-6 pt-28 pb-16">
+        {testStatus === "idle" && (
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold text-[#8B4513] mb-2">
+                ☕ Ready to Type?
+              </h1>
+              <p className="text-[#A0522D]">Configure your test and start brewing!</p>
+            </div>
+
+            {/* Mode Selection */}
+            <div className="bg-white/80 backdrop-blur-sm border border-[#DEB887]/30 rounded-xl p-6 shadow-md">
+              <label className="block text-sm font-semibold text-[#8B4513] mb-3">
+                Test Mode
+              </label>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setMode("time")}
+                  className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
+                    mode === "time"
+                      ? "bg-[#8B4513] text-[#FFE4C4] shadow-md"
+                      : "bg-white border border-[#DEB887] text-[#8B4513] hover:bg-[#FFE4C4]"
+                  }`}
+                >
+                  ⏱️ Time-based
+                </button>
+                <button
+                  onClick={() => setMode("chars")}
+                  className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
+                    mode === "chars"
+                      ? "bg-[#8B4513] text-[#FFE4C4] shadow-md"
+                      : "bg-white border border-[#DEB887] text-[#8B4513] hover:bg-[#FFE4C4]"
+                  }`}
+                >
+                  📝 Character-based
+                </button>
+              </div>
+            </div>
+
+            {/* Duration/Character Count */}
+            <div className="bg-white/80 backdrop-blur-sm border border-[#DEB887]/30 rounded-xl p-6 shadow-md">
+              <label className="block text-sm font-semibold text-[#8B4513] mb-3">
+                {mode === "time" ? "Duration" : "Character Count"}
+              </label>
+              <div className="flex gap-3">
+                {mode === "time"
+                  ? [15, 30, 60].map((sec) => (
+                      <button
+                        key={sec}
+                        onClick={() => setTargetValue(sec)}
+                        className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
+                          targetValue === sec
+                            ? "bg-[#D2691E] text-white shadow-md"
+                            : "bg-white border border-[#DEB887] text-[#8B4513] hover:bg-[#FFE4C4]"
+                        }`}
+                      >
+                        {sec}s
+                      </button>
+                    ))
+                  : [100, 200].map((chars) => (
+                      <button
+                        key={chars}
+                        onClick={() => setTargetValue(chars)}
+                        className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
+                          targetValue === chars
+                            ? "bg-[#D2691E] text-white shadow-md"
+                            : "bg-white border border-[#DEB887] text-[#8B4513] hover:bg-[#FFE4C4]"
+                        }`}
+                      >
+                        {chars} chars
+                      </button>
+                    ))}
+              </div>
+            </div>
+
+            {/* Text Source */}
+            <div className="bg-white/80 backdrop-blur-sm border border-[#DEB887]/30 rounded-xl p-6 shadow-md">
+              <label className="block text-sm font-semibold text-[#8B4513] mb-3">
+                Text Source
+              </label>
+              <div className="flex gap-3 mb-4">
+                <button
+                  onClick={() => setTextSource("random")}
+                  className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
+                    textSource === "random"
+                      ? "bg-[#8B4513] text-[#FFE4C4] shadow-md"
+                      : "bg-white border border-[#DEB887] text-[#8B4513] hover:bg-[#FFE4C4]"
+                  }`}
+                >
+                  🎲 Random Text
+                </button>
+                <button
+                  onClick={() => setTextSource("custom")}
+                  className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
+                    textSource === "custom"
+                      ? "bg-[#8B4513] text-[#FFE4C4] shadow-md"
+                      : "bg-white border border-[#DEB887] text-[#8B4513] hover:bg-[#FFE4C4]"
+                  }`}
+                >
+                  ✍️ Custom Text
+                </button>
+              </div>
+
+              {textSource === "custom" && (
+                <textarea
+                  value={customText}
+                  onChange={(e) => setCustomText(e.target.value)}
+                  placeholder="Paste or type your custom text here..."
+                  className="w-full px-4 py-3 bg-white border border-[#DEB887] rounded-lg focus:ring-2 focus:ring-[#8B4513] focus:border-transparent text-[#8B4513] placeholder-[#A0522D]/50"
+                  rows={4}
+                />
+              )}
+            </div>
+
+            <button
+              onClick={startTest}
+              className="w-full bg-gradient-to-r from-[#8B4513] to-[#A0522D] text-[#FFE4C4] py-4 rounded-xl text-lg font-bold hover:from-[#A0522D] hover:to-[#8B4513] transition-all transform hover:scale-[1.02] shadow-lg"
+            >
+              Start Test ✨
+            </button>
+          </div>
+        )}
+
+        {testStatus === "running" && (
+          <div className="space-y-6">
+            {/* Stats Bar */}
+            <div className="bg-white/80 backdrop-blur-sm border border-[#DEB887]/30 rounded-xl p-6 shadow-md">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {mode === "time" ? (
+                  <div className="text-center">
+                    <div className="text-sm text-[#A0522D] mb-1">Time Left</div>
+                    <div className="text-3xl font-bold text-[#8B4513]">{timeLeft}s</div>
+                  </div>
+                ) : (
+                  <div className="text-center">
+                    <div className="text-sm text-[#A0522D] mb-1">Chars Left</div>
+                    <div className="text-3xl font-bold text-[#8B4513]">
+                      {Math.max(0, targetValue - userInput.length)}
+                    </div>
+                  </div>
+                )}
+
+                <div className="text-center">
+                  <div className="text-sm text-[#A0522D] mb-1">WPM</div>
+                  <div className="text-3xl font-bold text-[#8B4513]">{currentWpm}</div>
+                </div>
+
+                <div className="text-center">
+                  <div className="text-sm text-[#A0522D] mb-1">Raw WPM</div>
+                  <div className="text-2xl font-bold text-[#A0522D]">{currentRawWpm}</div>
+                </div>
+
+                <div className="text-center">
+                  <div className="text-sm text-[#A0522D] mb-1">Errors</div>
+                  <div className="text-3xl font-bold text-red-600">{errors}</div>
                 </div>
               </div>
-            )}
-
-            <div>
-              <div className="text-sm text-gray-600">WPM</div>
-              <div className="text-3xl font-bold text-gray-900">{currentWpm}</div>
             </div>
 
-            <div>
-              <div className="text-sm text-gray-600">Raw WPM</div>
-              <div className="text-2xl font-bold text-gray-700">{currentRawWpm}</div>
+            {/* Text Display */}
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl p-8 shadow-lg border border-[#DEB887]/30 font-mono text-xl leading-relaxed">
+              {testText.split("").map((char, i) => {
+                let className = "text-[#A0522D]/40";
+                if (i < userInput.length) {
+                  className = userInput[i] === char 
+                    ? "text-[#2F5233]" 
+                    : "text-white bg-red-500 rounded";
+                }
+                if (i === userInput.length) {
+                  className += " border-l-2 border-[#8B4513] animate-pulse";
+                }
+                return (
+                  <span key={i} className={className}>
+                    {char}
+                  </span>
+                );
+              })}
             </div>
 
-            <div>
-              <div className="text-sm text-gray-600">Errors</div>
-              <div className="text-3xl font-bold text-red-600">{errors}</div>
-            </div>
+            {/* Input Area */}
+            <textarea
+              ref={inputRef}
+              value={userInput}
+              onChange={(e) => handleInputChange(e.target.value)}
+              className="w-full px-6 py-4 bg-white/90 backdrop-blur-sm border-2 border-[#8B4513] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D2691E] font-mono text-lg text-[#8B4513] shadow-lg"
+              rows={4}
+              autoFocus
+              placeholder="Start typing here..."
+            />
           </div>
+        )}
 
-          <div className="bg-gray-100 rounded-lg p-6 mb-4 font-mono text-xl leading-relaxed break-words">
-            {testText.split("").map((char, i) => {
-              let className = "text-gray-400";
-              if (i < userInput.length) {
-                className = userInput[i] === char 
-                  ? "text-green-600" 
-                  : "text-white bg-red-600";
-              }
-              if (i === userInput.length) {
-                className += " border-l-2 border-blue-500";
-              }
-              return (
-                <span key={i} className={className}>
-                  {char}
-                </span>
-              );
-            })}
-          </div>
+        {testStatus === "finished" && finalMetrics && (
+          <div className="space-y-6">
+            <div className="text-center mb-6">
+              <div className="text-6xl mb-4">🎉</div>
+              <h2 className="text-4xl font-bold text-[#8B4513] mb-2">
+                Test Complete!
+              </h2>
+              <p className="text-[#A0522D]">Great job! Here are your results</p>
+            </div>
 
-          <textarea
-            ref={inputRef}
-            value={userInput}
-            onChange={(e) => handleInputChange(e.target.value)}
-            className="w-full px-4 py-3 border-2 border-black rounded-lg focus:outline-none font-mono text-lg"
-            rows={4}
-            autoFocus
-          />
-        </>
-      )}
+            {/* Main Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-gradient-to-br from-[#8B4513] to-[#A0522D] rounded-xl p-6 text-center shadow-lg">
+                <div className="text-sm text-[#FFE4C4] mb-1">WPM</div>
+                <div className="text-4xl font-bold text-[#FFE4C4]">
+                  {Math.round(finalMetrics.wpm)}
+                </div>
+              </div>
 
-      {testStatus === "finished" && finalMetrics && (
-        <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">Test Complete! 🎉</h2>
+              <div className="bg-white/80 backdrop-blur-sm border border-[#DEB887]/30 rounded-xl p-6 text-center shadow-md">
+                <div className="text-sm text-[#A0522D] mb-1">Raw WPM</div>
+                <div className="text-3xl font-bold text-[#8B4513]">
+                  {Math.round(finalMetrics.rawWpm)}
+                </div>
+              </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
-              <div className="text-sm text-gray-600 mb-1">WPM</div>
-              <div className="text-3xl font-bold text-gray-900">
-                {Math.round(finalMetrics.wpm)}
+              <div className="bg-white/80 backdrop-blur-sm border border-[#DEB887]/30 rounded-xl p-6 text-center shadow-md">
+                <div className="text-sm text-[#A0522D] mb-1">Accuracy</div>
+                <div className="text-3xl font-bold text-[#8B4513]">
+                  {Math.round(finalMetrics.accuracy * 100)}%
+                </div>
+              </div>
+
+              <div className="bg-white/80 backdrop-blur-sm border border-[#DEB887]/30 rounded-xl p-6 text-center shadow-md">
+                <div className="text-sm text-[#A0522D] mb-1">Errors</div>
+                <div className="text-3xl font-bold text-red-600">{finalMetrics.errors}</div>
               </div>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
-              <div className="text-sm text-gray-600 mb-1">Raw WPM</div>
-              <div className="text-2xl font-bold text-gray-700">
-                {Math.round(finalMetrics.rawWpm)}
+            {/* Detailed Stats */}
+            <div className="bg-white/80 backdrop-blur-sm border border-[#DEB887]/30 rounded-xl p-6 shadow-md">
+              <h3 className="font-semibold text-[#8B4513] mb-4 text-lg">📊 Detailed Stats</h3>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-[#A0522D]">Duration:</span>
+                  <span className="font-semibold text-[#8B4513]">{finalMetrics.durationSec}s</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#A0522D]">Characters:</span>
+                  <span className="font-semibold text-[#8B4513]">{finalMetrics.charsTyped}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#A0522D]">Words:</span>
+                  <span className="font-semibold text-[#8B4513]">{finalMetrics.wordsTyped}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#A0522D]">Backspaces:</span>
+                  <span className="font-semibold text-[#8B4513]">{finalMetrics.backspaces}</span>
+                </div>
               </div>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
-              <div className="text-sm text-gray-600 mb-1">Accuracy</div>
-              <div className="text-3xl font-bold text-gray-900">
-                {Math.round(finalMetrics.accuracy * 100)}%
-              </div>
-            </div>
-
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
-              <div className="text-sm text-gray-600 mb-1">Errors</div>
-              <div className="text-3xl font-bold text-red-600">{finalMetrics.errors}</div>
-            </div>
-          </div>
-
-          <div className="bg-gray-100 rounded-lg p-6 mb-8 text-left max-w-2xl mx-auto">
-            <h3 className="font-semibold mb-3 text-gray-900">Detailed Stats</h3>
-            <div className="grid grid-cols-2 gap-4 text-sm text-gray-700">
-              <div>Duration: {finalMetrics.durationSec}s</div>
-              <div>Characters Typed: {finalMetrics.charsTyped}</div>
-              <div>Words Typed: {finalMetrics.wordsTyped}</div>
-              <div>Backspaces: {finalMetrics.backspaces}</div>
-            </div>
-          </div>
-
-          <div className="flex gap-4 justify-center">
-            <button
-              onClick={resetTest}
-              className="bg-black text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-800"
-            >
-              Take Another Test
-            </button>
-            {session?.user && (
+            {/* Actions */}
+            <div className="flex gap-4 justify-center flex-wrap">
               <button
-                onClick={() => router.push("/dashboard")}
-                className="bg-gray-200 text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300"
+                onClick={resetTest}
+                className="bg-[#8B4513] text-[#FFE4C4] px-8 py-3 rounded-xl font-bold hover:bg-[#A0522D] transition-all transform hover:scale-105 shadow-lg"
               >
-                View Dashboard
+                Take Another Test ☕
               </button>
-            )}
+              {session?.user && (
+                <button
+                  onClick={() => router.push("/dashboard")}
+                  className="bg-white border border-[#DEB887] text-[#8B4513] px-8 py-3 rounded-xl font-bold hover:bg-[#FFE4C4] transition-all transform hover:scale-105 shadow-md"
+                >
+                  View Dashboard 📊
+                </button>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
