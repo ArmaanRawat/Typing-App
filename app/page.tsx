@@ -205,7 +205,7 @@ export default async function HomePage() {
         <div className="max-w-6xl mx-auto px-6 text-center text-[#FFE4C4]">
           <p className="mb-1 text-sm">☕ TypeCafé - Where Typing Meets Coffee ⌨️</p>
           <p className="text-[#DEB887] text-xs">
-            Made with ❤️ for typing enthusiasts
+            Made with ❤️ by Armaan Rawat for fellow typing enthusiasts
           </p>
         </div>
       </footer>
